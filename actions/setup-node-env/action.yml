@@ -1,0 +1,26 @@
+name: Setup Node Environment
+description: Set up Node.js with npm caching and install dependencies
+
+inputs:
+  node-version:
+    description: Node.js version
+    required: false
+    default: '24'
+  install-command:
+    description: npm install command
+    required: false
+    default: npm ci
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v7
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+
+    - name: Install Node.js dependencies
+      if: inputs.install-command != ''
+      shell: bash
+      run: ${{ inputs.install-command }}

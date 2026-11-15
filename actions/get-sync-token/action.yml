@@ -1,0 +1,42 @@
+name: Get Sync Token
+description: Mint a GitHub App installation token or fall back to CROSS_REPO_TOKEN
+
+inputs:
+  app-id:
+    description: GitHub App ID
+    required: false
+    default: ''
+  private-key:
+    description: GitHub App private key
+    required: false
+    default: ''
+  owner:
+    description: Repository owner for the GitHub App installation
+    required: false
+    default: DMedina559
+  repositories:
+    description: Comma-separated or newline-separated repository names
+    required: false
+    default: ''
+  fallback-token:
+    description: Fallback PAT (CROSS_REPO_TOKEN) if App credentials are not configured
+    required: false
+    default: ''
+
+outputs:
+  token:
+    description: Resolved token for cross-repo dispatch and PR creation
+    value: ${{ steps.app-token.outputs.token || inputs.fallback-token }}
+
+runs:
+  using: composite
+  steps:
+    - name: Create GitHub App token
+      id: app-token
+      if: inputs.app-id != '' && inputs.private-key != ''
+      uses: actions/create-github-app-token@v2
+      with:
+        app-id: ${{ inputs.app-id }}
+        private-key: ${{ inputs.private-key }}
+        owner: ${{ inputs.owner }}
+        repositories: ${{ inputs.repositories }}
